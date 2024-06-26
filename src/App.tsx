@@ -14,9 +14,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import BaseDetailsManager from './components/createBusiness/baseDetailsManager';
 import EmailVerification from './components/createBusiness/emailVerification';
 import MoreDetailsManager from './components/createBusiness/moreDetailsManager';
-
 import Client from './components/client/Client';
-
 
 const menuItems = [
   {
@@ -49,6 +47,7 @@ const getUserType = (): UserType => {
 function App() {
   const [typeUser, setTypeUser] = useState<UserType | null>(null);
   const [currentMenu, setCurrentMenu] = useState<menuItem>(menuItems[0]);
+  const linkUID = window.location.pathname.substring(9);
 
   useEffect(() => {
     const type = getUserType();
@@ -64,31 +63,25 @@ function App() {
       <AuthMenu />
       <ThemeProvider theme={theme}>
         <Provider store={Store}>
-          <Header serviceName={currentMenu?.nameToView}><div></div></Header>
-          <div></div>
-          <SideMenu items={menuItems} setCurrentMenu={setCurrentMenu} />
 
-          <LazyRouter currentRoute={currentMenu?.route || ' '} />
           <Link to={'/CreateBusiness/BaseDetailsManager'}>הרשמה של עסק</Link>
 
           <Routes>
-
             <Route path="/CreateBusiness/BaseDetailsManager" element={<BaseDetailsManager />} />
             <Route path="/CreateBusiness/EmailVerification" element={<EmailVerification />} />
             <Route path="/CreateBusiness/MoreDetailsManager" element={<MoreDetailsManager />} />
           </Routes>
 
-
           {typeUser === UserType.Client ? (
-            <Client />
-          ) : (
-            <>
-              <Header serviceName={currentMenu?.nameToView}><div></div></Header>
-              <div></div>
-              <SideMenu items={menuItems} setCurrentMenu={setCurrentMenu} />
-              <LazyRouter currentRoute={currentMenu?.route || ' '} />
-            </>
-          )}
+              <Client linkUID={linkUID} />
+            ) : (
+              <>
+                <Header serviceName={currentMenu?.nameToView}><div></div></Header>
+                <div></div>
+                <SideMenu items={menuItems} setCurrentMenu={setCurrentMenu} />
+                <LazyRouter currentRoute={currentMenu?.route || ' '} />
+              </>
+            )}
           
         </Provider>
       </ThemeProvider>
