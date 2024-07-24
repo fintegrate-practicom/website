@@ -40,9 +40,9 @@ const initialState = {
 
 export const fetchUserById = createAsyncThunk(
   'fetchUserById',
-  async (userId: string, { dispatch }) => {
+  async ( _,{dispatch }) => {
     try {
-      const response = await InfraInterceptors.get(`$/currentUser/${userId}`);
+      const response = await InfraInterceptors.get(`$/currentUser`);
       const data = response.data;   
       dispatch(currentUserSlice.actions.setCurrentUser(data));      
       return data;
@@ -75,4 +75,3 @@ const currentUserSlice = createSlice({
 
 export const selectCurrentUser = (state: RootState) => state.currentUserSlice.CurrentUser;
 export default currentUserSlice.reducer;
-
