@@ -25,6 +25,9 @@ const Profile: React.FC = () => {
       }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
   }
+
+  setCookie("user_id", user?.sub as string, 30);
+
   useEffect(() => {  
       
     const getUserMetadata = async () => {
@@ -45,6 +48,8 @@ const Profile: React.FC = () => {
           },
         });
         const user_metadata = await metadataResponse.json();
+
+
         setUserMetadata(user_metadata);        
         dispatch(fetchUserById(user_metadata?.user_id));        
       } catch (e) {
