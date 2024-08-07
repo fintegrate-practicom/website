@@ -26,7 +26,7 @@ const ShoppingDetails = () => {
 
     const saveDetails = async (data: Record<string, any>) => {
         try {
-            let response = await addItem("orders", data);
+            const response = await addItem("orders", data);
             alert("ההזמנה נשמרה בהצלחה");
             console.log(response);
         } catch (err) {
