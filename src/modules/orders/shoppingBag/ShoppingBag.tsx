@@ -14,7 +14,7 @@ import { deleteItem, updateItem } from '../Api-Requests/genericRequests';
 
 const ShoppingBag: React.FC<{  }> = () => {
   const [total, setTotal] = useState<number>(0);
-  const bag=useAppSelector((state) => state.basketSlice?.data || [])
+  const bag=useAppSelector((state) => state.basketSlice?.data )
   const dispatch=useDispatch()
 
   useEffect(() => {
@@ -24,26 +24,29 @@ const ShoppingBag: React.FC<{  }> = () => {
 
   const calculateTotal = () => {
     let sum=0;
-    bag.forEach(product=>sum+=product.metadata.quantity*product.metadata.price)
+    bag.forEach(
+      product=>
+        sum += product.metadata.quantity * product.metadata.price
+    )
     setTotal(sum);
   };
 
-  const handleRemove =async (index: string) => {
+  const handleRemove =async (cart_id: string) => {
     if (window.confirm('האם ברצונך להסיר את המוצר?')) {
       try {
-        await deleteItem<ICart>('cart',index)
-        dispatch(deleteFromBasket(index));
+        await deleteItem<ICart>('cart',cart_id)
+        dispatch(deleteFromBasket(cart_id));
       } catch (error) {
         
       }
     }
   };
 
-  const handleAmountChange = async (index: string, newAmount: number) => {
+  const handleAmountChange = async (cart_id: string, newAmount: number) => {
     if (newAmount === 0) {
-      handleRemove(index);
+      handleRemove(cart_id);
     } else {
-      const ProductToUpdate = bag.find(x => x.id === index);
+      const ProductToUpdate = bag.find(x => x.id === cart_id);
       if (ProductToUpdate !== undefined) {
         const updatedMetadata = {
           ...ProductToUpdate.metadata,
