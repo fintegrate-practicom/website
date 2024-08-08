@@ -1,33 +1,14 @@
-import { Meta, StoryFn } from '@storybook/react';
-import FormWrapper from './FormWrapper';
+import React from 'react';
+import { StoryFn, Meta } from '@storybook/react';
+import FormWrapper, { FormWrapperProps } from './FormWrapper';
 import { FieldValues } from 'react-hook-form';
-import { action } from '@storybook/addon-actions';
 
-const meta: Meta<typeof FormWrapper> = {
+export default {
   title: 'Components/FormWrapper',
   component: FormWrapper,
-  parameters: {
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-  argTypes: {
-    formWidth: {
-      control: { type: 'select' },
-      options: ['short', 'medium', 'long'],
-    },
-    onSubmit: { action: 'submitted' },
-  },
-};
+} as Meta;
 
-export default meta;
-
-const Template: StoryFn<typeof FormWrapper> = (args) => {
-  const handleSubmit = (data: FieldValues) => {
-    action('submitted')(data);
-  };
-
-  return <FormWrapper {...args} onSubmit={handleSubmit} />;
-};
+const Template: StoryFn<FormWrapperProps> = (args) => <FormWrapper {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
@@ -68,22 +49,8 @@ Default.args = {
         },
       },
     },
-    {
-      name: 'terms',
-      label: 'Accept Terms',
-      type: 'checkbox',
-    },
-    {
-      name: 'fileUpload',
-      label: 'Upload File',
-      type: 'file',
-    },
-    {
-      name: 'selectOption',
-      label: 'Select Option',
-      type: 'select',
-      options: ['Option 1', 'Option 2', 'Option 3'],
-    },
   ],
-  formWidth: 'short',
+  onSubmit: (values: FieldValues) => {
+    console.log(values);
+  },
 };

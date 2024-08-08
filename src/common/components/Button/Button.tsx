@@ -7,8 +7,8 @@ interface ButtonProps {
     onClick?: () => void;
     href?: string;
     isLink?: boolean;
-    color?: "primary"|"secondary" | "success"|"info";
-    component?:"button" | "label" | "span" ;
+    color?: "primary" | "secondary" | "success";
+    component?: "button" | "label";
     type?: 'button' | 'submit' | 'reset' | 'span';
     disabled?: boolean;
     size?: "small" | "medium" | "large"
@@ -70,4 +70,3 @@ const Button = (props: React.ComponentProps<typeof MaterialButton> & ButtonProps
 };
 
 export default Button;
-

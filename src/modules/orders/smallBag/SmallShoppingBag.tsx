@@ -104,3 +104,4 @@ const SmallShoppingBag = () => {
 };
 
 export default SmallShoppingBag;
+
