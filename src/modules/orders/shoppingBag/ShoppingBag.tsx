@@ -5,49 +5,67 @@ import Typography from '../../../common/components/Typography/Typography';
 import Button from '../../../common/components/Button/Button'
 import DeleteForever from '@mui/icons-material/DeleteForever';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-
-interface BagItem {
-  image: string;
-  name: string;
-  model: string;
-  description: string;
-  price: number;
-  size: number;
-  amount: number;
-}
+import { ICart } from '../interfaces/ICart';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../../Redux/hooks';
+import { deleteFromBasket, updateBasket } from '../features/basket/basketSlice';
+import { deleteItem, updateItem } from '../Api-Requests/genericRequests';
 
 
-const ShoppingBag: React.FC<{ initialBag?: BagItem[] }> = ({ initialBag }) => {
-  const [bag, setBag] = useState<BagItem[]>(initialBag||[]);
+const ShoppingBag: React.FC<{  }> = () => {
   const [total, setTotal] = useState<number>(0);
+  const bag=useAppSelector((state) => state.basketSlice?.data )
+  const dispatch=useDispatch()
 
   useEffect(() => {
     calculateTotal();
   }, [bag]);
 
+
   const calculateTotal = () => {
-    const sum = bag.reduce((acc, item) => acc + item.price * item.amount, 0);
+    let sum=0;
+    bag.forEach(
+      product=>
+        sum += product.metadata.quantity * product.metadata.price
+    )
     setTotal(sum);
   };
 
-  const handleRemove = (index: number) => {
+  const handleRemove =async (cart_id: string) => {
     if (window.confirm('האם ברצונך להסיר את המוצר?')) {
-      const newBag = bag.filter((_, i) => i !== index);
-      setBag(newBag);
+      try {
+        await deleteItem<ICart>('cart',cart_id)
+        dispatch(deleteFromBasket(cart_id));
+      } catch (error) {
+        
+      }
     }
   };
 
-  const handleAmountChange = (index: number, newAmount: number) => {
+  const handleAmountChange = async (cart_id: string, newAmount: number) => {
     if (newAmount === 0) {
-      handleRemove(index);
+      handleRemove(cart_id);
     } else {
-      const newBag = bag.map((item, i) => {
-        if (i === index) {
-          return { ...item, amount: newAmount };
+      const ProductToUpdate = bag.find(x => x.id === cart_id);
+      if (ProductToUpdate !== undefined) {
+        const updatedMetadata = {
+          ...ProductToUpdate.metadata,
+          quantity: ProductToUpdate.metadata.quantity !== undefined ? newAmount : 0 // בדיקה אם quantity קיים
+        };
+  
+        const updatedProduct = {
+          ...ProductToUpdate,
+          metadata: updatedMetadata
+        };
+  
+        try {
+          await updateItem<ICart>('cart',index,updatedProduct)
+          dispatch(updateBasket(updatedProduct));
+        } catch (error) {
+          
         }
-        return item;
-      });
-      setBag(newBag);
+
+      }
     }
   };
 
@@ -64,6 +82,7 @@ const ShoppingBag: React.FC<{ initialBag?: BagItem[] }> = ({ initialBag }) => {
                 <TableCell align='right'> שם המוצר </TableCell>
                 <TableCell align='right'> כמות </TableCell>
                 <TableCell align='right'> מחיר </TableCell>
+                <TableCell align='right'>פרטים נוספים </TableCell>
                 <TableCell align='right'> . </TableCell>
               </TableRow>
             </TableHead>
@@ -71,22 +90,27 @@ const ShoppingBag: React.FC<{ initialBag?: BagItem[] }> = ({ initialBag }) => {
               {bag.map((row, index) => (
                 <TableRow key={row.name}>
                   <TableCell align='right'>
-                    {row.name} <img src={row.image} width='80px' alt={row.name} />
+                    {row.product.name} <img src={row.image} width='80px' alt={""} />
                   </TableCell>
                   <TableCell align='right'>
                     <TextField
                       type='number'
-                      value={row.amount}
-                      onChange={(e) => handleAmountChange(index, Number(e.target.value))}
+                      value={row.metadata.quantity}
+                      onChange={(e) => handleAmountChange(row.id, Number(e.target.value))}
                     />
                   </TableCell>
                   <TableCell align='right'>
-                    {(row.price * row.amount).toFixed(2)} ₪
+                    {row.metadata.price} ₪
+                  </TableCell>
+                  <TableCell align='right'>
+                    {Object.entries(row.metadata).map(([key, value]) => (
+                      <Typography key={key}>{`${key}: ${value}`}</Typography>
+                    ))}
                   </TableCell>
                   <TableCell align='right'>
                     <IconButton
                       aria-label='הסרת המוצר'
-                      onClick={() => handleRemove(index)}
+                      onClick={() => handleRemove(row.id)}
                     >
                       <DeleteForever />
                     </IconButton>
@@ -100,7 +124,9 @@ const ShoppingBag: React.FC<{ initialBag?: BagItem[] }> = ({ initialBag }) => {
           </Table>
           <Button
             onClick={() => alert('payment button was clicked')}
-            startIcon={<ArrowBackIosIcon />}
+            variant='contained'
+            endIcon={<ArrowBackIosIcon />}
+
             style={{ textTransform: 'none' }}
             size='large'
           >
