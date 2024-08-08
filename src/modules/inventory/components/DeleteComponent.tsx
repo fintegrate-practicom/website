@@ -7,12 +7,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useDispatch } from 'react-redux';
-import { deleteProduct as deleteProductFromState } from '../features/product/productSlice';
+import { deleteComponent as deleteComponentFromState } from '../features/component/componentSlice';
 import { deleteItem } from '../Api-Requests/genericRequests';
-import { IProduct } from '../interfaces/IProduct';
+import { IComponent } from '../interfaces/IComponent';
 import { IconButton, Snackbar, Alert } from '@mui/material';
 
-const DeleteProduct = ({ item }: { item: IProduct }) => {
+const DeleteComponent = ({ item }: { item: IComponent }) => {
     const [open, setOpen] = React.useState(false);
     //this is temporarily here until the toast from story book is ready
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -29,19 +29,19 @@ const DeleteProduct = ({ item }: { item: IProduct }) => {
         setOpen(false);
     };
 
-    const deleteProduct = async () => {
+    const deleteComponent = async () => {
         try {
-            await deleteItem("api/inventory/product", item.id);
+            await deleteItem("api/inventory/component", item.id);
             //this is temporarily here until the toast from story book is ready
-            setSnackbarMessage("Product deleted successfully");
+            setSnackbarMessage("Component deleted successfully");
             setSnackbarSeverity("success");
             setSnackbarOpen(true);
             //end temporary toast
-            dispatch(deleteProductFromState(item.id));
+            dispatch(deleteComponentFromState(item.id));
         } catch (err) {
             console.log(err);
             //this is temporarily here until the toast from story book is ready
-            setSnackbarMessage("Failed to delete product");
+            setSnackbarMessage("Failed to delete component");
             setSnackbarSeverity("error");
             setSnackbarOpen(true);
             //end temporary toast
@@ -62,16 +62,16 @@ const DeleteProduct = ({ item }: { item: IProduct }) => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    Are you sure you want to delete this product?
+                    Are you sure you want to delete this component?
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Product to delete: {item.name}
+                        Component to delete: {item.name}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={deleteProduct} autoFocus>
+                    <Button onClick={deleteComponent} autoFocus>
                         Delete
                     </Button>
                 </DialogActions>
@@ -81,6 +81,7 @@ const DeleteProduct = ({ item }: { item: IProduct }) => {
                 open={snackbarOpen}
                 autoHideDuration={6000}
                 onClose={() => setSnackbarOpen(false)}
+                message={snackbarMessage}
                 action={
                     <Button onClick={() => setSnackbarOpen(false)}>
                         Close
@@ -95,4 +96,4 @@ const DeleteProduct = ({ item }: { item: IProduct }) => {
     );
 };
 
-export default DeleteProduct;
+export default DeleteComponent;
